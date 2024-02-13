@@ -1,0 +1,141 @@
+<div id="getBooks">
+    <form id="addBook">
+        <h5>Add Book</h5>
+        <input type="text" id="name" name="name" placeholder="name" required>
+        <input type="text" id="author" name="author" placeholder="author" required>
+        <input type="text" id="year" name="year" placeholder="year" required>
+        <input type="number" id="page_count" name="page_count" placeholder="page_count" required>
+        <input type="text" id="publisher" name="publisher" placeholder="publisher" required>
+        <input type="submit" value="Kirim">
+    </form>
+    <form id="editBook">
+        <h5>Edit Book</h5>
+        <input type="text" id="id" name="id" placeholder="id" required>
+        <input type="text" id="name" name="name" placeholder="name" required>
+        <input type="text" id="author" name="author" placeholder="author" required>
+        <input type="text" id="year" name="year" placeholder="year" required>
+        <input type="number" id="page_count" name="page_count" placeholder="page_count" required>
+        <input type="text" id="publisher" name="publisher" placeholder="publisher" required>
+        <input type="submit" value="Kirim">
+    </form>
+    <form id="deleteBook">
+        <h5>Detele Book</h5>
+        <input type="text" id="id" name="id" placeholder="id" required>
+        <input type="submit" value="Kirim">
+    </form>
+</div>
+<script>
+    const url = "http://localhost:3000"
+
+    const elm_dataBuku = document.getElementById("getBooks");
+    async function getBooks() {
+        const api = await fetch(url);
+        const { data } = await api.json();
+        data.forEach((data) => {
+            const element_buku = document.createElement("div");
+            element_buku.innerHTML = `Id: ${data.id},
+                                      Nama Buku: ${data.name},
+                                      publisher: ${data.publisher},
+                                      year: ${data.year},
+                                      page count: ${data.page_count}`
+
+            elm_dataBuku.eppendChild(element_buku);
+        });
+    }
+    getBooks;
+//--------------------------------------------------------------------------------
+    async function postData(url = "", {}) {
+        try {
+            const response = await fetch(url , {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(data),
+            });
+
+            if (!response.ok) {
+                throw new Error("Terjadi kesalahan pada server.");
+            }
+            return await response.json();
+        } catch (error) {
+            throw new Error("Terjadi kesalahan:", error.message);
+        }
+    }
+    document.getElementById("addBook").addEventListener("submit", async function (e) {
+        const formData = new FormData(this);
+        const data = {};
+        formData.forEach((value, key) => {
+            data[key] = value;
+        });
+        try {
+            const result = await postData(url, data);
+        } catch (error) {
+            console.log(error.message);
+        }
+    });
+    //------------------------------------------------------------------------------------------------
+    async function editData(url = "", data = {}, id) {
+        try {
+            const newUrl = `${url}/${id}`;
+            const response = await fetch(newUrl, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(data),
+            });
+            if (!response.ok) {
+                throw new Error("Terjadi kesalaham pada server.");
+            }
+            return await response.json();
+        } catch (error) {
+            throw new Error("Terjadi kesalahan:", error.message);
+        }
+    }
+    //---------------------------------------------------------------------------------------------
+    document.getElementById("editBook").addEventListener("submit", async function (e) {
+        const formData = new FormData(this);
+        const data = {};
+        formData.forEach((value, key) => {
+            data[key] = value;
+        });
+        const id = data.id;
+        delete data.id;
+        try {
+            const result = await editBook(url, data, id);
+        } catch (error) {
+            console.log(error.message);
+        }
+    });
+    //-----------------------------------------------------------------------------------------------
+    async function deleteData(url = "", id) {
+        try {
+            const newUrl = `${url}/${id}`;
+            console.log(newUrl);
+            const response = await fetch(newUrl, {
+                method: "DELETE",
+            });
+            if (!response.ok) {
+                throw new Error("Terjadi kesalaham pada server.");
+            }
+            return await response.json();
+        } catch (error) {
+            throw new Error("Terjadi kesalahan:", error.message);
+        }
+    }
+
+    document.getElementById("deleteBook").addEventListener("submit", async function (e) {
+        const formData = new FormData(this);
+        const data = {};
+        formData.forEach((value, key) => {
+            data[key] = value;
+        });
+        const id = data.id;
+        try {
+            const result = await deleteBook(url, id);
+        } catch (error) {
+            console.log(error.message);
+        }
+    });
+</script>
